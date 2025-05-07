@@ -1,5 +1,5 @@
 ---
-- name: Smoke test for EL_Gitleaks role
+- name: Smoke test for galaxy_test role
   hosts: localhost
   connection: local
   become: true
@@ -7,15 +7,15 @@
     gitleaks_version: "8.25.0"
     configure_offline: false
   roles:
-    - role: ../../../EL_Gitleaks
+    - role: ../../../galaxy_test
 
   tasks:
     - name: Check Gitleaks version
-      command: /usr/local/bin/gitleaks --version
+      ansible.builtin.command: /usr/local/bin/gitleaks --version
       register: result
       changed_when: false
       failed_when: "'{{ gitleaks_version }}' not in result.stdout"
 
     - name: Print installed version
-      debug:
+      ansible.builtin.debug:
         var: result.stdout

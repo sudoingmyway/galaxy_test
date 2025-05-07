@@ -4,12 +4,12 @@
   become: true
   pre_tasks:
     - name: Copy offline binary into place
-      copy:
+      ansible.builtin.copy:
         src: "../../files/gitleaks"   # Must exist
         dest: /tmp/gitleaks
         mode: '0755'
   roles:
-    - role: ../../../EL_Gitleaks
+    - role: galaxy_test
       vars:
         configure_offline: true
         gitleaks_dest: "/usr/local/bin/gitleaks"

@@ -3,7 +3,7 @@
   hosts: all
   become: true
   roles:
-    - role: ../../../EL_Gitleaks
+    - role: ../../../galaxy_test
       vars:
         configure_offline: false
 
