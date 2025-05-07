@@ -1,0 +1,23 @@
+---
+scenario:
+  name: online
+dependency:
+  name: galaxy
+driver:
+  name: podman
+platforms:
+  - name: centos-9-stream
+    image: quay.io/centos/centos:stream9
+  - name: rhel9
+    image: registry.access.redhat.com/ubi9/ubi
+provisioner:
+  name: ansible
+  log: true
+  options:
+    vvv: true
+  roles:
+    - role: EL_Gitleaks
+verifier:
+  name: ansible
+lint: |
+  ansible-lint

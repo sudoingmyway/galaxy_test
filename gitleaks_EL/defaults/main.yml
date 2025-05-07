@@ -1,0 +1,8 @@
+---
+# Default variables
+configure_offline: false
+gitleaks_version: "8.25.0"
+gitleaks_dest: "/usr/local/bin/gitleaks"
+gitleaks_download_url: "https://github.com/gitleaks/gitleaks/releases/download/v{{ gitleaks_version }}/gitleaks_{{ gitleaks_version }}_linux_x64.tar.gz"
+gitleaks_tmp_dir: "{{ ansible_env.HOME }}/.gitleaks_tmp_install"
+offline_gitleaks_sha256: "a4b6ec120e0d4da50370e7ae64d0ef17f2d120d0f6143931a3061e3992f00565"

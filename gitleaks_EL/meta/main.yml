@@ -1,0 +1,30 @@
+---
+galaxy_info:
+  author: Ayesha Shafqat, Pierre Gronau
+  description: An Ansible role for installing and configuring Gitleaks.
+  company: ndaal, Cologne
+  license: Apache 2.0
+  min_ansible_version: 2.9
+  role_name: gitleak_el
+  namespace: ndaal
+
+  platforms:
+    - name: EL
+      versions:
+        - 9
+    - name: CentOS
+      versions:
+        - 8
+        - 9
+    - name: Fedora
+      versions:
+        - all
+
+  galaxy_tags:
+    - gitleaks
+    - security
+    - scanning
+    - devops
+    - automation
+
+dependencies: []

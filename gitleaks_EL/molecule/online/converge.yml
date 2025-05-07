@@ -1,0 +1,9 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  roles:
+    - role: ../../../EL_Gitleaks
+      vars:
+        configure_offline: false
+

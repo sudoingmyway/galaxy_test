@@ -1,0 +1,10 @@
+---
+- name: Verify Gitleaks Offline Install
+  hosts: all
+  tasks:
+    - name: Check if Gitleaks is installed
+      command: /usr/local/bin/gitleaks --version
+      register: result
+      changed_when: false
+      failed_when: result.rc != 0 or "8.25.0" not in result.stdout
+

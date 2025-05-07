@@ -1,0 +1,17 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  pre_tasks:
+    - name: Copy offline binary into place
+      copy:
+        src: "../../files/gitleaks"   # Must exist
+        dest: /tmp/gitleaks
+        mode: '0755'
+  roles:
+    - role: ../../../EL_Gitleaks
+      vars:
+        configure_offline: true
+        gitleaks_dest: "/usr/local/bin/gitleaks"
+        offline_gitleaks_sha256: "a4b6ec120e0d4da50370e7ae64d0ef17f2d120d0f6143931a3061e3992f00565"
+

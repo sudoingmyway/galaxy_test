@@ -1,0 +1,89 @@
+---
+- name: Check if Gitleaks is already installed
+  ansible.builtin.command: "{{ gitleaks_dest }} --version"
+  register: current_gitleaks_version
+  ignore_errors: true
+  changed_when: false
+
+- name: Skip installation if correct version is already installed
+  ansible.builtin.meta: end_play
+  when: current_gitleaks_version.stdout is search(gitleaks_version)
+
+- name: Install tar
+  ansible.builtin.dnf:
+    name: tar
+    state: present
+  become: true
+
+- name: Ensure /usr/local/bin exists
+  ansible.builtin.file:
+    path: "/usr/local/bin"
+    state: directory
+    mode: '0755'
+
+- name: Install Gitleaks (Offline mode)
+  ansible.builtin.copy:
+    src: gitleaks
+    dest: "{{ gitleaks_dest }}"
+    mode: '0755'
+  when: configure_offline
+  become: true
+
+- name: Get Gitleaks binary file info (Offline mode)
+  ansible.builtin.stat:
+    path: "{{ gitleaks_dest }}"
+    checksum_algorithm: sha256
+  register: gitleaks_binary_stat
+  when: configure_offline and offline_gitleaks_sha256 != ''
+
+- name: Fail if checksum does not match expected hash (Offline mode)
+  ansible.builtin.fail:
+    msg: "Gitleaks binary checksum mismatch! Expected {{ offline_gitleaks_sha256 }}, got {{ gitleaks_binary_stat.stat.checksum }}"
+  when: configure_offline and offline_gitleaks_sha256 != '' and gitleaks_binary_stat.stat.checksum != offline_gitleaks_sha256
+
+- name: Create temporary directory for Gitleaks (Online mode)
+  ansible.builtin.file:
+    path: "{{ gitleaks_tmp_dir }}"
+    state: directory
+    mode: '0755'
+  when: not configure_offline
+
+- name: Download Gitleaks archive (Online mode)
+  ansible.builtin.get_url:
+    url: "{{ gitleaks_download_url }}"
+    dest: "{{ gitleaks_tmp_dir }}/gitleaks.tar.gz"
+    mode: '0644'
+  when: not configure_offline
+
+- name: Extract Gitleaks archive (Online mode)
+  ansible.builtin.unarchive:
+    src: "{{ gitleaks_tmp_dir }}/gitleaks.tar.gz"
+    dest: "{{ gitleaks_tmp_dir }}"
+    remote_src: true
+  when: not configure_offline
+
+- name: Copy Gitleaks binary to final location (Online mode)
+  ansible.builtin.copy:
+    src: "{{ gitleaks_tmp_dir }}/gitleaks"
+    dest: "{{ gitleaks_dest }}"
+    remote_src: true
+    mode: '0755'
+  when: not configure_offline
+  become: true
+
+- name: Ensure Gitleaks binary is executable
+  ansible.builtin.file:
+    path: "{{ gitleaks_dest }}"
+    mode: '0755'
+
+- name: Verify Gitleaks installation
+  ansible.builtin.command: "{{ gitleaks_dest }} --version"
+  register: gitleaks_version_output
+  changed_when: false
+  failed_when: gitleaks_version_output.rc != 0 or gitleaks_version not in gitleaks_version_output.stdout
+
+- name: Clean up Gitleaks temporary directory (Online mode)
+  ansible.builtin.file:
+    path: "{{ gitleaks_tmp_dir }}"
+    state: absent
+  when: not configure_offline
